@@ -16,7 +16,11 @@
         };
       in {
         devShells.default = pkgs.mkShell {
-          packages = [pkgs.rust-bin.stable.latest.default];
+          packages = [
+            (pkgs.rust-bin.stable.latest.default.override {
+              extensions = ["rust-src" "rust-analyzer"];
+            })
+          ];
         };
       };
     };
