@@ -14,7 +14,19 @@
           inherit system;
           overlays = [inputs.rust-overlay.overlays.default];
         };
+
+        niri-cwd = pkgs.rustPlatform.buildRustPackage {
+          pname = "niri-cwd";
+          version = "1.0.0";
+          src = ./.;
+          cargoLock.lockFile = ./Cargo.lock;
+        };
       in {
+        packages = {
+          inherit niri-cwd;
+          default = niri-cwd;
+        };
+
         devShells.default = pkgs.mkShell {
           packages = [
             (pkgs.rust-bin.stable.latest.default.override {
