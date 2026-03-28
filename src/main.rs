@@ -1,14 +1,34 @@
 mod error;
 
+use clap::Parser;
 use error::NiriCwdError;
 use niri_ipc::{Request, Response, socket::Socket};
 use procfs::process::Process;
-use std::path::PathBuf;
+use std::{path::PathBuf, process::exit};
+
+#[derive(Parser)]
+struct Args {
+    /// Directory to output in case of error
+    #[arg(short, long, value_name = "DIR")]
+    default_dir: Option<PathBuf>,
+}
 
 fn main() {
-    match get_focused_cwd() {
-        Ok(path) => println!("{}", path.display()),
-        Err(e) => eprintln!("{}", e),
+    let args = Args::parse();
+
+    match (get_focused_cwd(), args.default_dir) {
+        (Ok(path), _) => {
+            println!("{}", path.display());
+        }
+
+        (Err(_), Some(default_dir)) => {
+            println!("{}", default_dir.display())
+        }
+
+        (Err(err), _) => {
+            eprintln!("{}", err);
+            exit(1)
+        }
     }
 }
 
